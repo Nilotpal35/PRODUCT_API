@@ -1,68 +1,60 @@
+require("dotenv").config();
 const express = require("express");
 const body_parser = require("body-parser");
-const multer = require("multer");
 const path = require("path");
 const { adminRouter } = require("./Routes/admin");
-
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join("images"));
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
+const { MongoConnect } = require("./util/database");
+const session = require("express-session");
+const { authRouter } = require("./Routes/auth");
+const MongoDbStore = require("connect-mongodb-session")(session);
 
 const app = express();
 
 app.use(body_parser.json());
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); // Replace with your frontend's domain
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
 
-// app.get("/posts", (req, res, next) => {
-//   res.status(200).json({
-//     title: "Nilotpal",
-//     Content: "This is me bro!",
-//     message: "Successfull",
-//   });
-// });
+const store = new MongoDbStore({
+  uri: process.env.MONGODB_URI,
+  databaseName: "shop",
+  collection: "user",
+});
 
-// app.post("/posts", (req, res, next) => {
-//   try {
-//     console.log("UPCOMING DATA", req.body?.title);
-//     res.status(200).json({ message: "Successfully", title: req.body?.title });
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: store,
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 1000 * 60 * 2,
+    },
+  })
+);
 
-app.use("/", adminRouter)
-// app.post("/fileUpload", upload.single("imageUrl"), (req, res, next) => {
-//   //   console.log("OTHER DATA ", req.body?.title);
-//   console.log("FILE ", req.body);
-//   console.log("FILE ", req.file);
+app.use("/admin", adminRouter);
 
-//   if (req?.file) {
-//     res.status(200).json({ message: "File Uploaded Successfully!" });
-//   } else {
-//     next(new Error("File not found "));
-//   }
-// });
+app.use("/", authRouter);
+
+app.use((req, res, next) => {
+  res.status(401).json({ message: "page not found" });
+});
 
 app.use((err, req, res, next) => {
   console.log("backend error", err?.message);
-  res.status(404).json({ error : err?.message });
+  const status = err.status || 500;
+  const message = err.message || "Backend Error";
+  res.status(status).json({ message: message });
 });
 
-app.listen(8080, () => {
-  console.log(`server running on port 8080`);
+MongoConnect(() => {
+  app.listen(8080, () => {
+    console.log(`server running on port 8080`);
+  });
 });
