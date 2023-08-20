@@ -1,6 +1,5 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-
 const client = new MongoClient(process.env.MONGODB_URI, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -12,14 +11,10 @@ const client = new MongoClient(process.env.MONGODB_URI, {
 let _db;
 
 const run = async (cb) => {
-  try {
-    await client.connect();
-    _db = await client.db("shop").command({ ping: 1 });
-    console.log("~MONGO DB SERVER CONNECTED~");
-    cb();
-  } finally {
-    await client.close();
-  }
+  await client.connect();
+  console.log("~MONGO DB SERVER CONNECTED~");
+  _db = client.db("shop");
+  cb();
 };
 
 const MongoConnect = (cb) => {

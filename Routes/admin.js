@@ -51,6 +51,7 @@ adminRouter.post(
   (req, res, next) => {
     console.log("REQ BODY", req.body);
     console.log("REQ FILE", req.file);
+    console.log("SESSION",req?.session?.userId);ƒ
     let errorMessage = "";
     const error = validationResult(req);
     error.errors.map((item) => {

@@ -4,9 +4,7 @@ const body_parser = require("body-parser");
 const path = require("path");
 const { adminRouter } = require("./Routes/admin");
 const { MongoConnect } = require("./util/database");
-const session = require("express-session");
 const { authRouter } = require("./Routes/auth");
-const MongoDbStore = require("connect-mongodb-session")(session);
 
 const app = express();
 
@@ -20,27 +18,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const store = new MongoDbStore({
-  uri: process.env.MONGODB_URI,
-  databaseName: "shop",
-  collection: "user",
-});
+app.use("/", authRouter);
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    store: store,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 2,
-    },
-  })
-);
 
 app.use("/admin", adminRouter);
-
-app.use("/", authRouter);
 
 app.use((req, res, next) => {
   res.status(401).json({ message: "page not found" });
