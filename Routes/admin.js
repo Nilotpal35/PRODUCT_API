@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const multer = require("multer");
 // const multerUtil = require("../util/multer");
 const path = require("path");
+const { postAddProduct } = require("../controller/adminController");
 
 const adminRouter = express.Router();
 
@@ -33,8 +34,9 @@ adminRouter.post(
     check("title", "Title should be more than 4 char")
       .trim()
       .notEmpty()
-      .isAlphanumeric().custom((value) => {
-        return value.length > 4
+      .isAlphanumeric()
+      .custom((value) => {
+        return value.length > 4;
       }),
     check("price", "Price should be greater than 5")
       .isDecimal()
@@ -44,29 +46,39 @@ adminRouter.post(
     check("description", "Description should be more than 5 character")
       .trim()
       .notEmpty()
-      .isAlphanumeric().custom((value) => {
-        return value.length > 5
+      .isAlphanumeric()
+      .custom((value) => {
+        return value.length > 5;
       }),
   ],
-  (req, res, next) => {
-    console.log("REQ BODY", req.body);
-    console.log("REQ FILE", req.file);
-    console.log("SESSION",req?.session?.userId);ƒ
-    let errorMessage = "";
-    const error = validationResult(req);
-    error.errors.map((item) => {
-      errorMessage += "->" + item.msg;
-    });
-    if (errorMessage.trim().length > 0 && error.errors.length > 0) {
-      return next(new Error(errorMessage));
-    } else {
-      if (req.file) {
-        res.status(200).json({ message: "FILE UPLOADED SUCCESSFULLY" });
-      } else {
-        next(new Error("FILE NOT PRESENT"));
-      }
-    }
-  }
+  postAddProduct
+);
+
+adminRouter.post(
+  "/edit-product",
+  upload.single("imageUrl"),
+  [
+    check("title", "Title should be more than 4 char")
+      .trim()
+      .notEmpty()
+      .isAlphanumeric()
+      .custom((value) => {
+        return value.length > 4;
+      }),
+    check("price", "Price should be greater than 5")
+      .isDecimal()
+      .custom((value) => {
+        return +value > 5;
+      }),
+    check("description", "Description should be more than 5 character")
+      .trim()
+      .notEmpty()
+      .isAlphanumeric()
+      .custom((value) => {
+        return value.length > 5;
+      }),
+  ],
+  postAddProduct
 );
 
 exports.adminRouter = adminRouter;

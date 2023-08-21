@@ -5,10 +5,12 @@ const path = require("path");
 const { adminRouter } = require("./Routes/admin");
 const { MongoConnect } = require("./util/database");
 const { authRouter } = require("./Routes/auth");
+const { productRouter } = require("./Routes/product");
 
 const app = express();
 
 app.use(body_parser.json());
+app.use(express.static(path.join("store", "iamges")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -20,6 +22,7 @@ app.use((req, res, next) => {
 
 app.use("/", authRouter);
 
+app.use("/", productRouter);
 
 app.use("/admin", adminRouter);
 
