@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { getDb } = require("../util/database");
 
 module.exports = class prodModel {
@@ -9,7 +10,6 @@ module.exports = class prodModel {
         .find()
         .toArray()
         .then((res) => {
-          console.log(res);
           return res;
         })
         .catch((err) => {
@@ -18,5 +18,19 @@ module.exports = class prodModel {
     } catch (error) {
       throw error;
     }
+  }
+
+  static getProductById(prodId) {
+    const db = getDb();
+    return db
+      .collection("product")
+      .findOne({ _id: new ObjectId(prodId) })
+      .then((res) => {
+        console.log("FIND PRODUCT BY ID", res);
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 };

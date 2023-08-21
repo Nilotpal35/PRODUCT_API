@@ -6,7 +6,7 @@ module.exports = class authModel {
     const db = getDb();
     try {
       return db
-        .collection("user")
+        .collection("users")
         .findOne({ email: email })
         .then((res) => {
           return res;
@@ -15,7 +15,7 @@ module.exports = class authModel {
           console.log(err);
         });
     } catch (error) {
-      console.log("ERROR IN CHECK USER BY EMAIL", error.message);
+      throw error;
     }
   }
 
@@ -30,7 +30,21 @@ module.exports = class authModel {
         return res;
       })
       .catch((err) => {
-        console.log(err);
+        throw err;
+      });
+  }
+
+  static storeNewUser(formData) {
+    const db = getDb();
+    return db
+      .collection("users")
+      .insertOne(formData)
+      .then((res) => {
+        console.log("res", res);
+        return res;
+      })
+      .catch((err) => {
+        throw err;
       });
   }
 };
