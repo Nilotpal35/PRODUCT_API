@@ -6,6 +6,7 @@ const { adminRouter } = require("./Routes/admin");
 const { MongoConnect } = require("./util/database");
 const { authRouter } = require("./Routes/auth");
 const { productRouter } = require("./Routes/product");
+const { cartRouter } = require("./Routes/cart");
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(express.static(path.join("store", "iamges")));
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
@@ -23,6 +24,8 @@ app.use((req, res, next) => {
 app.use("/", authRouter);
 
 app.use("/", productRouter);
+
+app.use("/", cartRouter);
 
 app.use("/admin", adminRouter);
 

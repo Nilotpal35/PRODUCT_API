@@ -4,6 +4,7 @@ const {
   generateBcryptHashPawsword,
   comparePassword,
 } = require("../util/bcrypt");
+const { cartModel } = require("../model/cartModel");
 
 exports.postLoginCtr = async (req, res, next) => {
   let errorMessage = "";
@@ -28,7 +29,11 @@ exports.postLoginCtr = async (req, res, next) => {
         if (compResult) {
           res
             .status(200)
-            .json({ message: `${user.name} Succesfully logged in!` });
+            .json({
+              message: `${user.name} Succesfully logged in!`,
+              userToken: user?._id,
+              userName: user?.name,
+            });
         } else {
           return next(new Error("wrong email or password"));
         }
@@ -50,11 +55,11 @@ exports.postSignUpCtr = async (req, res, next) => {
   } else {
     const data = matchedData(req);
     const { name, dob, email, password, cnfPassword } = data;
-    console.log("Name", name);
-    console.log("EMAIL", email);
-    console.log("DOB", dob);
-    console.log("CNFPASSWORD", cnfPassword);
-    console.log("PASSWORD", password);
+    // console.log("Name", name);
+    // console.log("EMAIL", email);
+    // console.log("DOB", dob);
+    // console.log("CNFPASSWORD", cnfPassword);
+    // console.log("PASSWORD", password);
     try {
       const hashPwd = await generateBcryptHashPawsword(password, 10);
       console.log("HASH PASSWORD", hashPwd);
@@ -65,7 +70,13 @@ exports.postSignUpCtr = async (req, res, next) => {
         password: hashPwd,
       };
       const response = await authModel.storeNewUser(formData);
-      console.log("response data", response.data, response.status);
+      console.log("response data", response);
+      if (response?.insertedId) {
+        await cartModel.initiateCart({
+          userId: response?.insertedId.toString(),
+          cartItems: [],
+        });
+      }
       res.status(201).json({ message: "Succesfully Signed Up!" });
     } catch (error) {
       return next(err);
