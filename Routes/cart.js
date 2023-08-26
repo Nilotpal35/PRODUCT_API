@@ -1,8 +1,10 @@
-const { header } = require("express-validator");
+const { header, param } = require("express-validator");
 const {
   addCartController,
   getCartController,
+  deleteCartController,
 } = require("../controller/cartController");
+const prodModel = require("../model/productModel");
 
 const cartRouter = require("express").Router();
 
@@ -16,6 +18,26 @@ cartRouter.post(
   //   (req, res, next) => {
   //     console.log("add cart backend", req.headers);
   //   }
+);
+
+cartRouter.delete(
+  "/delete-cart/:prodId",
+  [
+    header("userid", "user id field is blank")
+      .trim()
+      .notEmpty()
+      .isAlphanumeric(),
+    param("prodId")
+      .trim()
+      .notEmpty()
+      .custom(async (value) => {
+        const product = await prodModel.getProductById(value);
+        if (!product) {
+          throw new Error("item not available in cart!");
+        }
+      }),
+  ],
+  deleteCartController
 );
 
 cartRouter.get(

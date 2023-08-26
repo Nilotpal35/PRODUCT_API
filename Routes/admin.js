@@ -41,7 +41,7 @@ adminRouter.post(
       .notEmpty()
       .isString()
       .custom((value) => {
-        return value.length > 4;
+        return value.length > 7;
       }),
     check("price", "Price should be greater than 5")
       .isDecimal()
