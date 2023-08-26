@@ -26,7 +26,6 @@ module.exports = class prodModel {
       .collection("product")
       .findOne({ _id: new ObjectId(prodId) })
       .then((res) => {
-        console.log("FIND PRODUCT BY ID", res);
         return res;
       })
       .catch((err) => {
