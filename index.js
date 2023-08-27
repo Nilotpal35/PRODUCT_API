@@ -7,6 +7,7 @@ const { MongoConnect } = require("./util/database");
 const { authRouter } = require("./Routes/auth");
 const { productRouter } = require("./Routes/product");
 const { cartRouter } = require("./Routes/cart");
+const { orderRouter } = require("./Routes/order");
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use("/", authRouter);
 app.use("/", productRouter);
 
 app.use("/", cartRouter);
+
+app.use("/", orderRouter);
 
 app.use("/admin", adminRouter);
 

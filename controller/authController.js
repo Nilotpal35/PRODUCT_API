@@ -5,6 +5,7 @@ const {
   comparePassword,
 } = require("../util/bcrypt");
 const { cartModel } = require("../model/cartModel");
+const { orderModel } = require("../model/orderModel");
 
 exports.postLoginCtr = async (req, res, next) => {
   let errorMessage = "";
@@ -27,13 +28,11 @@ exports.postLoginCtr = async (req, res, next) => {
         console.log("USER ", user);
         const compResult = await comparePassword(password, user.password);
         if (compResult) {
-          res
-            .status(200)
-            .json({
-              message: `${user.name} Succesfully logged in!`,
-              userToken: user?._id,
-              userName: user?.name,
-            });
+          res.status(200).json({
+            message: `${user.name} Succesfully logged in!`,
+            userToken: user?._id,
+            userName: user?.name,
+          });
         } else {
           return next(new Error("wrong email or password"));
         }
@@ -72,14 +71,24 @@ exports.postSignUpCtr = async (req, res, next) => {
       const response = await authModel.storeNewUser(formData);
       console.log("response data", response);
       if (response?.insertedId) {
-        await cartModel.initiateCart({
-          userId: response?.insertedId.toString(),
-          cartItems: [],
-        });
+        cartModel
+          .initiateCart({
+            userId: response?.insertedId.toString(),
+            cartItems: [],
+          })
+          .then((result) => {
+            orderModel
+              .initiateOrder({
+                userId: response?.insertedId.toString(),
+                orderItems: [],
+              })
+              .then((result) => {
+                res.status(201).json({ message: "Succesfully Signed Up!" });
+              });
+          });
       }
-      res.status(201).json({ message: "Succesfully Signed Up!" });
     } catch (error) {
-      return next(err);
+      return next(error);
     }
   }
 };

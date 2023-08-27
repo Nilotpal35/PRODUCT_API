@@ -23,8 +23,8 @@ module.exports = class authModel {
     console.log("USER ID", userId);
     const db = getDb();
     return db
-      .collection("user")
-      .findOne({ _id: ObjectId(userId.toString()) })
+      .collection("users")
+      .findOne({ _id: new ObjectId(userId.toString()) })
       .then((res) => {
         console.log("res", res);
         return res;
