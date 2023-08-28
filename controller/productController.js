@@ -1,6 +1,7 @@
 const prodModel = require("../model/productModel");
 
 exports.productController = async (req, res, next) => {
+  console.log("REQ USER ID", req.userId);
   try {
     const products = await prodModel.getAllProducts();
     console.log("All products", products);

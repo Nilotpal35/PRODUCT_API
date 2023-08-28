@@ -5,11 +5,13 @@ const {
   deleteCartController,
 } = require("../controller/cartController");
 const prodModel = require("../model/productModel");
+const { isAuth } = require("../util/isAuth");
 
 const cartRouter = require("express").Router();
 
 cartRouter.post(
   "/add-cart",
+  isAuth,
   [
     header("itemid", "item Id not matched").trim().notEmpty(),
     header("userid", "User not found").trim().notEmpty(),
@@ -22,6 +24,7 @@ cartRouter.post(
 
 cartRouter.delete(
   "/delete-cart/:prodId",
+  isAuth,
   [
     header("userid", "user id field is blank")
       .trim()
@@ -42,6 +45,7 @@ cartRouter.delete(
 
 cartRouter.get(
   "/cart",
+  isAuth,
   [header("userid", "User not found").trim().notEmpty()],
   getCartController
 );

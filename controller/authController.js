@@ -1,3 +1,4 @@
+require("dotenv");
 const { validationResult, matchedData } = require("express-validator");
 const authModel = require("../model/authModel");
 const {
@@ -6,6 +7,7 @@ const {
 } = require("../util/bcrypt");
 const { cartModel } = require("../model/cartModel");
 const { orderModel } = require("../model/orderModel");
+const jwt = require("jsonwebtoken");
 
 exports.postLoginCtr = async (req, res, next) => {
   let errorMessage = "";
@@ -28,11 +30,24 @@ exports.postLoginCtr = async (req, res, next) => {
         console.log("USER ", user);
         const compResult = await comparePassword(password, user.password);
         if (compResult) {
-          res.status(200).json({
-            message: `${user.name} Succesfully logged in!`,
-            userToken: user?._id,
-            userName: user?.name,
-          });
+          const token = jwt.sign(
+            {
+              email: user.email,
+              userId: user._id.toString(),
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+          );
+          if (token) {
+            res.status(200).json({
+              message: `${user.name} Succesfully logged in!`,
+              userToken: user?._id,
+              userName: user?.name,
+              token,
+            });
+          } else {
+            return next(new Error("Token not generated"));
+          }
         } else {
           return next(new Error("wrong email or password"));
         }

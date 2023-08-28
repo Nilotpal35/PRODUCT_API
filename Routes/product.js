@@ -1,10 +1,11 @@
 const path = require("path");
 const { productController } = require("../controller/productController");
 const fs = require("fs");
+const { isAuth } = require("../util/isAuth");
 
 const productRouter = require("express").Router();
 
-productRouter.get("/products", productController);
+productRouter.get("/products", isAuth, productController);
 
 productRouter.get("/image/:image", (req, res, next) => {
   const imageName = req.params.image;

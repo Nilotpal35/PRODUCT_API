@@ -4,11 +4,13 @@ const {
   getOrderCtrl,
   postOrderCtrl,
 } = require("../controller/orderController");
+const { isAuth } = require("../util/isAuth");
 
 const orderRouter = require("express").Router();
 
 orderRouter.get(
   "/get-order",
+  isAuth,
   [
     header("userid", "user id not found")
       .trim()
@@ -25,6 +27,7 @@ orderRouter.get(
 
 orderRouter.post(
   "/post-order",
+  isAuth,
   [
     header("userid", "user id not found")
       .trim()
