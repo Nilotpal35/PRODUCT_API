@@ -1,24 +1,29 @@
 const { buildSchema } = require("graphql");
 
 const schema = buildSchema(`
-    input setMessageInput {
-        author : String!
-        content : String!
+    input postLoginForm {
+        userName : String!
+        password : String!
     }
 
-    input updateMessageInput {
-        auhtor : String!
-        content : String!
+    type loginReturn {
+        token : String
     }
 
+    input postSignupForm {
+        name : String!
+        email : String!
+        dob : String!
+        password : String!
+        cnfPassword : String!
+    }
 
     type Query {
-        getMessage(id : ID!) : String
+        postLogin(input : postLoginForm) : loginReturn
     }
 
     type Mutation {
-        setMessage(input : setMessageInput ) : String
-        updateMessage(id : ID! , input : updateMessageInput) : String
+        postSignup(input : postSignupForm) : String
     }
 `);
 
