@@ -1,10 +1,83 @@
 const validator = require("validator");
 const { v4: uuid } = require("uuid");
+const { checkEmailValidity } = require("../useful/emailValid");
+const authModel = require("../model/authModel");
+const { comparePassword } = require("../util/bcrypt");
+const { generateToken } = require("../useful/generateToken");
+const prodModel = require("../model/productModel");
 
 const resolvers = {
-  postLogin: (args) => {
-    console.log("POST LOGIN FORM", args);
-    return { token: "dfgdg54rtgrgrtghreg435fgd" };
+  postLogin: async ({ input }, req) => {
+    console.log("Authentication", req.isAuth);
+    console.log("POST LOGIN FORM", input.email);
+    const emailValidation =
+      validator.isEmail(input.email) && (await checkEmailValidity(input.email));
+    if (!emailValidation) {
+      throw new Error("email not valid");
+    } else {
+      //db operation
+      const user = await authModel.checkUserByEmail(input.email);
+      const isValidPassword = await comparePassword(
+        input.password,
+        user.password
+      );
+      if (!isValidPassword) {
+        throw new Error("wrong email or password");
+      } else {
+        const GENERATED_TOKEN = await generateToken({
+          email: input.email,
+          userId: user._id.toString(),
+        });
+        if (GENERATED_TOKEN) {
+          return {
+            status: 200,
+            message: `${user.name} Successfully logged in `,
+            userName: user.name,
+            userToken: user._id,
+            token: GENERATED_TOKEN,
+          };
+        }
+      }
+    }
+  },
+
+  postProducts: async ({ page }, req) => {
+    // console.log("Authentication", req.isAuth);
+    if (!req.isAuth) {
+      throw new Error("User not Authorized");
+    }
+    let PAGE = 1;
+    if (page) {
+      PAGE = +page;
+    }
+    let PER_PAGE = 1;
+    try {
+      const totalPage = await prodModel.getTotalDocuments();
+      //generates total no of pages into array form
+      const generatedArray = [];
+      for (let i = 1; i <= totalPage; i++) {
+        generatedArray.push(i);
+      }
+
+      const products = await prodModel.getAllProducts(PAGE, PER_PAGE);
+      console.log("ALL PRODUCTS", products);
+      if (products) {
+        return {
+          products: products,
+          // .map((item) => ({
+          //   ...item,
+          //   _id: item._id.toString(),
+          //   title: item.title,
+          //   price: item.price,
+          //   imageUrl: item.imageUrl,
+          //   description: item.description,
+          // }))
+          totalPages: generatedArray,
+        };
+      }
+    } catch (error) {
+      throw error;
+    }
   },
 
   postSignup: ({ input }) => {

@@ -2,16 +2,16 @@ require("dotenv").config();
 const express = require("express");
 const body_parser = require("body-parser");
 const path = require("path");
-// const { adminRouter } = require("./Routes/admin");
+const { adminRouter } = require("./Routes/admin");
 const { MongoConnect } = require("./util/database");
-// const { authRouter } = require("./Routes/auth");
-// const { productRouter } = require("./Routes/product");
-// const { cartRouter } = require("./Routes/cart");
-// const { orderRouter } = require("./Routes/order");
+const { authRouter } = require("./Routes/auth");
+const { productRouter } = require("./Routes/product");
+const { cartRouter } = require("./Routes/cart");
+const { orderRouter } = require("./Routes/order");
 const { graphqlHTTP } = require("express-graphql");
 const resolvers = require("./graphql/resolvers");
 const schema = require("./graphql/schema");
-const cors = require("cors");
+const { isAuth } = require("./util/isAuth");
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use(cors);
+app.use(isAuth);
 
 app.use(
   "/graphql",
@@ -40,19 +40,19 @@ app.use(
   })
 );
 
-// app.use("/", authRouter);
+app.use("/", authRouter);
 
-// app.use("/", productRouter);
+app.use("/", productRouter);
 
-// app.use("/", cartRouter);
+app.use("/", cartRouter);
 
-// app.use("/", orderRouter);
+app.use("/", orderRouter);
 
-// app.use("/admin", adminRouter);
+app.use("/admin", adminRouter);
 
-// app.use((req, res, next) => {
-//   res.status(401).json({ message: "page not found" });
-// });
+app.use((req, res, next) => {
+  res.status(401).json({ message: "page not found" });
+});
 
 app.use((err, req, res, next) => {
   console.log("backend error", err?.message);

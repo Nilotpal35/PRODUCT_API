@@ -10,10 +10,16 @@ exports.productController = async (req, res, next) => {
   const perPage = 1;
   try {
     const totalPage = await prodModel.getTotalDocuments();
+    const generatedArray = [];
+
+    for (let i = 1; i <= totalPage; i++) {
+      generatedArray.push(i);
+    }
+
     const products = await prodModel.getAllProducts(page, perPage);
     console.log("All products", products);
     if (products) {
-      res.status(200).json({ products, totalPage });
+      res.status(200).json({ products, totalPage: generatedArray });
     }
   } catch (error) {
     next(error);
