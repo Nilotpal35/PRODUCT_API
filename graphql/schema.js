@@ -35,13 +35,30 @@ const schema = buildSchema(`
         products : [product]
     }
 
-    type Query {
-        postLogin(input : postLoginForm) : loginReturn
-        postProducts(page : Int) : AllProducts
+    input postAddCartForm {
+        userId : String
+        prodId : String
     }
 
-    type Mutation {
+    type AddCartMessage {
+        message : String
+        status : Int
+    }
+
+    type RootQuery {
+        postLogin(input : postLoginForm) : loginReturn
+        postProducts(page : Int) : AllProducts
+        
+    }
+
+    type RootMutation {
         postSignup(input : postSignupForm) : String
+        postAddCart(input : postAddCartForm) : AddCartMessage
+    }
+
+    schema {
+        query : RootQuery
+        mutation : RootMutation
     }
 `);
 
