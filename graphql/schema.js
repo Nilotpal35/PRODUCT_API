@@ -45,15 +45,35 @@ const schema = buildSchema(`
         status : Int
     }
 
+    type cartProduct {
+        _id : String
+        title : String
+        price : String
+        imageUrl : String
+        description : String
+        qty : Int
+    }
+
+    type cartReturn {
+        product : [cartProduct!]!
+    }
+
+    input deleteCartForm {
+        userId : String
+        prodId : String
+    }
+
     type RootQuery {
         postLogin(input : postLoginForm) : loginReturn
         postProducts(page : Int) : AllProducts
-        
+        postCartItems(userId : String) : cartReturn
+        postDeleteCart(prodId : String) : AddCartMessage
     }
 
     type RootMutation {
         postSignup(input : postSignupForm) : String
         postAddCart(input : postAddCartForm) : AddCartMessage
+        
     }
 
     schema {
