@@ -11,6 +11,7 @@ const {
   postProductController,
 } = require("../graphql_controller/productController");
 const { cartModel } = require("../model/cartModel");
+const { orderModel } = require("../model/orderModel");
 const prodModel = require("../model/productModel");
 
 const resolvers = {
@@ -27,11 +28,25 @@ const resolvers = {
   postDeleteCart: postDeleteCartController,
 
   postOrder: async ({ input }, req) => {
-    console.log("post order input data", input);
-    return {
-      message: "Order Successfull",
-      status: 200,
-    };
+    if (!req.isAuth) {
+      const err = new Error("User not Authorized!");
+      err.statusCode = 404;
+      throw err;
+    }
+    const userId = req?.userId;
+    try {
+      const response = await orderModel.postOrderUpdate(userId, input?.product);
+      if (response) {
+        await cartModel.removeCartAfterOrderSuccessfull(userId);
+        return {
+          message: "Order successfull!",
+        };
+      } else {
+        return { message: "Order successfull but cart items not deleted!" };
+      }
+    } catch (error) {
+      throw error;
+    }
   },
 };
 

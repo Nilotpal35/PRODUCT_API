@@ -76,6 +76,10 @@ const schema = buildSchema(`
         product : [cartForm!]!
     }
 
+    type simpleReturn {
+        message : String
+    }
+
     type RootQuery {
         postLogin(input : postLoginForm) : loginReturn!
         postProducts(page : Int) : AllProducts!
@@ -86,7 +90,7 @@ const schema = buildSchema(`
         postSignup(input : postSignupForm) : String
         postAddCart(input : postAddCartForm) : AddCartMessage!
         postDeleteCart(prodId : String!) : AddCartMessage!
-        postOrder(input : [cartForm!]!) : AddCartMessage!
+        postOrder(input : postOrderForm!) : simpleReturn!
     }
 
     schema {
