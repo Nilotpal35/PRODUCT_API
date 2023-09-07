@@ -12,11 +12,34 @@ const { graphqlHTTP } = require("express-graphql");
 const resolvers = require("./graphql/resolvers");
 const schema = require("./graphql/schema");
 const { isAuth } = require("./util/isAuth");
+const multer = require("multer");
 
 const app = express();
 
+//file upload with multer
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join("store", "images"));
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [".png", ".jpg", ".jpeg", ".gif", ".avif"];
+  if (allowedTypes.includes(path.extname(file.originalname))) {
+    cb(null, true);
+  } else {
+    cb(new Error("FILE TYPE NOT ALLOWED"));
+  }
+};
+
+
 app.use(body_parser.json());
-app.use(express.static(path.join("store", "iamges")));
+app.use(express.static(path.join("store", "images")));
+
+app.use(multer({storage : storage , fileFilter : fileFilter}).single("imageUrl"))
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -28,6 +51,18 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.post("/upload-image" ,isAuth,(req,res,next) => {
+  console.log("upload image", req.isAuth)
+  console.log("upload image", req.body);
+  console.log("upload image", req.file);
+  if(!req.isAuth){
+    const err = new Error("User not Authorized!")
+    err.statusCode = 401;
+    return next(err);
+  }
+  res.status(200).json({filename : req?.file?.originalname})
+})  
 
 app.use(isAuth);
 
@@ -55,9 +90,9 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log("backend error", err?.message);
-  const status = err.status || 500;
-  const message = err.message || "Backend Error";
+  console.log("backend error", err?.message, err?.statusCode);
+  const status = err?.statusCode || 500;
+  const message = err?.message || "Backend Error";
   res.status(status).json({ message: message });
 });
 

@@ -80,10 +80,36 @@ const schema = buildSchema(`
         message : String
     }
 
+    type orderItem {
+        _id : String
+    }
+
+    type orderItems {
+        prodId : String
+        _id : String
+        qty : Int
+        title : String
+        price : String
+        description : String
+        imageUrl : String
+    }
+
+    type orderObject {
+        orderAt : String
+        items : [orderItems!]!
+    }
+
+    type orderReturn {
+        message : String
+        orderItems : [orderObject!]!
+    }
+
     type RootQuery {
         postLogin(input : postLoginForm) : loginReturn!
         postProducts(page : Int) : AllProducts!
         postCartItems(userId : String) : cartReturn!
+        getAllOrders(page : Int) : orderReturn!
+        getSingleProductById(prodId : String!) : product! 
     }
 
     type RootMutation {

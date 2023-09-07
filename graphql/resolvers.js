@@ -48,6 +48,57 @@ const resolvers = {
       throw error;
     }
   },
+  getAllOrders: async ({ page }, req) => {
+    if (!req.isAuth) {
+      throw new Error("User not Authorized!");
+    }
+    console.log("page no ", page);
+    const userid = req.userId;
+    try {
+      const orderResponse = await orderModel.getAllOrders(userid);
+      if (orderResponse) {
+        return {
+          message : "Successfull",
+          orderItems : orderResponse?.orderItems
+        }
+      } else {
+        console.log("Nothing in order Items");
+        // return next(new Error("some issue in fetching order"));
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+
+    return {
+      message: "Hello ",
+      orderItems: [
+        {
+          _id: "demoId",
+          title: "demoTitle",
+          price: "demoPrice",
+          description: "demoDescription",
+          imageUrl: "demoUrl",
+          qty: 1,
+        },
+      ],
+    };
+  },
+
+  getSingleProductById : async ({prodId},req) => {
+    if(!req.isAuth){
+      throw new Error("User not Authorized!")
+    }
+    try {
+      const product = await prodModel.getProductById(prodId);
+      if(!product) {
+        throw new Error("No product found with this id")
+      }
+      console.log("Product",product);
+      return product
+    } catch (error) {
+      throw error
+    }
+  }
 };
 
 module.exports = resolvers;
