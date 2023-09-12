@@ -7,6 +7,6 @@ exports.generateBcryptHashPawsword = async (password, saltRounds) => {
 
 exports.comparePassword = async (password, hash) => {
   const matchedResult = await bcrypt.compare(password, hash);
-  console.log("matchedResult", matchedResult);
+  // console.log("matchedResult", matchedResult);
   return matchedResult;
 };

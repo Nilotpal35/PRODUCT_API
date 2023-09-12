@@ -24,6 +24,25 @@ exports.isAuth = (req, res, next) => {
   next();
 };
 
+exports.isValidUser = (req, res, next) => {
+  const authHeader = req.get("Authorization");
+  if (!authHeader) {
+    return next(new Error("User not Authorized"));
+  }
+  const jwt_token = authHeader.split(" ")[1];
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(jwt_token, process.env.JWT_SECRET);
+  } catch (error) {
+    return next(error);
+  }
+  if (!decodedToken) {
+    return next(new Error("User not Authorized"));
+  }
+  req.isAuth = true
+  next();
+};
+
 // const AuthToken = req.get("Authorization");
 //   let token;
 //   let decodedToken;

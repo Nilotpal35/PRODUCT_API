@@ -104,19 +104,28 @@ const schema = buildSchema(`
         orderItems : [orderObject!]!
     }
 
+    input createUpdateProductData  {
+        _id : String!
+        title : String!
+        price : String!
+        imageUrl : String!
+        description : String!
+    }
+
     type RootQuery {
         postLogin(input : postLoginForm) : loginReturn!
         postProducts(page : Int) : AllProducts!
         postCartItems(userId : String) : cartReturn!
         getAllOrders(page : Int) : orderReturn!
         getSingleProductById(prodId : String!) : product! 
+        postSignup(input : postSignupForm) : String
     }
 
     type RootMutation {
-        postSignup(input : postSignupForm) : String
         postAddCart(input : postAddCartForm) : AddCartMessage!
         postDeleteCart(prodId : String!) : AddCartMessage!
         postOrder(input : postOrderForm!) : simpleReturn!
+        createUpdateProduct(method : String!,input : createUpdateProductData!) : AddCartMessage!
     }
 
     schema {

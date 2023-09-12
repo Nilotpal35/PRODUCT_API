@@ -11,10 +11,19 @@ const { orderRouter } = require("./Routes/order");
 const { graphqlHTTP } = require("express-graphql");
 const resolvers = require("./graphql/resolvers");
 const schema = require("./graphql/schema");
-const { isAuth } = require("./util/isAuth");
+const { isAuth, isValidUser } = require("./util/isAuth");
 const multer = require("multer");
+const helmet = require("helmet");
+const fs = require("fs");
+// const compression = require("compression");
+// const cors = require("cors");
+const morgan = require("morgan");
+const { fetchSearchResult } = require("./graphql_controller/productController");
+const prodModel = require("./model/productModel");
 
 const app = express();
+
+const PORT = process.env.PORT || 8080;
 
 //file upload with multer
 const storage = multer.diskStorage({
@@ -35,16 +44,20 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+const appLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), {
+  flags: "a",
+});
 
 app.use(body_parser.json());
 app.use(express.static(path.join("store", "images")));
 
-app.use(multer({storage : storage , fileFilter : fileFilter}).single("imageUrl"))
+app.use(morgan("combined", { stream: appLogStream }));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Methods", "*");
-  res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
@@ -52,20 +65,31 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/upload-image" ,isAuth,(req,res,next) => {
-  console.log("upload image", req.isAuth)
-  console.log("upload image", req.body);
-  console.log("upload image", req.file);
-  if(!req.isAuth){
-    const err = new Error("User not Authorized!")
-    err.statusCode = 401;
-    return next(err);
+app.use("/serverHealth", (req, res, next) => {
+  console.log("api endpoint triggering");
+  res.status(200).json({ message: "Server is Up" });
+});
+
+app.get("/searchResult", fetchSearchResult);
+
+app.post(
+  "/upload-image",
+  isValidUser,
+  upload.single("imageUrl"),
+  (req, res, next) => {
+    if (!req?.isAuth) {
+      fs.unlinkSync(path.join("store", "images", req?.file.originalname));
+      const err = new Error("User not Authorized!");
+      err.statusCode = 401;
+      return next(err);
+    }
+    res.status(200).json({ filename: req?.file?.originalname });
   }
-  res.status(200).json({filename : req?.file?.originalname})
-})  
+);
 
 app.use(isAuth);
 
+//GRAPHQL API Endpoint
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -75,6 +99,7 @@ app.use(
   })
 );
 
+//REST API endpoint
 app.use("/", authRouter);
 
 app.use("/", productRouter);
@@ -86,18 +111,24 @@ app.use("/", orderRouter);
 app.use("/admin", adminRouter);
 
 app.use((req, res, next) => {
-  res.status(401).json({ message: "page not found" });
+  res.status(404).json({ message: "page not found" });
 });
 
+//catch any error thrown
 app.use((err, req, res, next) => {
-  console.log("backend error", err?.message, err?.statusCode);
   const status = err?.statusCode || 500;
   const message = err?.message || "Backend Error";
   res.status(status).json({ message: message });
 });
 
 MongoConnect(() => {
-  app.listen(8080, () => {
+  app.listen(PORT, () => {
     console.log(`server running on port 8080`);
   });
+});
+
+process.on("SIGINT", () => {
+  console.log("Server is shutting down!");
+
+  process.exit(0);
 });

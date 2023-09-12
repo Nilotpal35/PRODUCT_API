@@ -6,8 +6,8 @@ const { comparePassword } = require("../util/bcrypt");
 const { generateToken } = require("../useful/generateToken");
 
 exports.postLoginController = async ({ input }, req) => {
-  console.log("Authentication", req.isAuth);
-  console.log("POST LOGIN FORM", input.email);
+  // console.log("Authentication", req.isAuth);
+  // console.log("POST LOGIN FORM", input.email);
   const emailValidation =
     validator.isEmail(input.email) && (await checkEmailValidity(input.email));
   if (!emailValidation) {
@@ -40,7 +40,7 @@ exports.postLoginController = async ({ input }, req) => {
 };
 
 exports.postSignupController = ({ input }) => {
-  console.log("POST SIGNUP FORM", input);
+  // console.log("POST SIGNUP FORM", input);
   let errorMessage = "";
   const nameValidation = validator.isLength(input.name, { min: 5 });
   const emailValidation = validator.isEmail(input.email);
@@ -57,12 +57,12 @@ exports.postSignupController = ({ input }) => {
   if (!emailValidation) {
     errorMessage += "Email not correct";
   }
-  // console.log("emailvalidation", emailValidation);
-  // console.log("namevalidation", nameValidation);
-  // console.log("Password Validation", passwordValidation);
+  // // console.log("emailvalidation", emailValidation);
+  // // console.log("namevalidation", nameValidation);
+  // // console.log("Password Validation", passwordValidation);
 
   if (nameValidation && emailValidation && passwordValidation) {
-    return "Sign Up successfull";
+    return "Sign Up successfully";
   } else {
     throw new Error(errorMessage);
   }

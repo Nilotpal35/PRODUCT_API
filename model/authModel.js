@@ -20,13 +20,13 @@ module.exports = class authModel {
   }
 
   static getUserById(userId) {
-    console.log("USER ID", userId);
+    // console.log("USER ID", userId);
     const db = getDb();
     return db
       .collection("users")
       .findOne({ _id: new ObjectId(userId.toString()) })
       .then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         return res;
       })
       .catch((err) => {
@@ -40,7 +40,7 @@ module.exports = class authModel {
       .collection("users")
       .insertOne(formData)
       .then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         return res;
       })
       .catch((err) => {

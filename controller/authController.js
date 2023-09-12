@@ -20,14 +20,14 @@ exports.postLoginCtr = async (req, res, next) => {
   } else {
     const data = matchedData(req);
     const { email, password } = data;
-    console.log("EMAIL", email);
-    console.log("PASSWORD", password);
+    // console.log("EMAIL", email);
+    // console.log("PASSWORD", password);
     try {
       const user = await authModel.checkUserByEmail(email);
       if (!user) {
         return next(new Error("User not found"));
       } else {
-        console.log("USER ", user);
+        // console.log("USER ", user);
         const compResult = await comparePassword(password, user.password);
         if (compResult) {
           const token = jwt.sign(
@@ -69,14 +69,14 @@ exports.postSignUpCtr = async (req, res, next) => {
   } else {
     const data = matchedData(req);
     const { name, dob, email, password, cnfPassword } = data;
-    // console.log("Name", name);
-    // console.log("EMAIL", email);
-    // console.log("DOB", dob);
-    // console.log("CNFPASSWORD", cnfPassword);
-    // console.log("PASSWORD", password);
+    // // console.log("Name", name);
+    // // console.log("EMAIL", email);
+    // // console.log("DOB", dob);
+    // // console.log("CNFPASSWORD", cnfPassword);
+    // // console.log("PASSWORD", password);
     try {
       const hashPwd = await generateBcryptHashPawsword(password, 10);
-      console.log("HASH PASSWORD", hashPwd);
+      // console.log("HASH PASSWORD", hashPwd);
       const formData = {
         name,
         email,
@@ -84,7 +84,7 @@ exports.postSignUpCtr = async (req, res, next) => {
         password: hashPwd,
       };
       const response = await authModel.storeNewUser(formData);
-      console.log("response data", response);
+      // console.log("response data", response);
       if (response?.insertedId) {
         cartModel
           .initiateCart({

@@ -8,7 +8,7 @@ const {
   postEditProduct,
 } = require("../controller/adminController");
 const prodModel = require("../model/productModel");
-const { isAuth } = require("../util/isAuth");
+const { isAuth, isValidUser } = require("../util/isAuth");
 
 const adminRouter = express.Router();
 
@@ -34,7 +34,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 adminRouter.post(
   "/add-product",
-  isAuth,
+  isValidUser,
   upload.single("imageUrl"),
   [
     check("_id", "Id should be emoty in add product field").trim().isEmpty(),
@@ -63,7 +63,7 @@ adminRouter.post(
 
 adminRouter.post(
   "/edit-product",
-  isAuth,
+  isValidUser,
 
   upload.single("imageUrl"),
   [
@@ -72,7 +72,7 @@ adminRouter.post(
       .notEmpty()
       .custom(async (value) => {
         const prod = await prodModel.getProductById(value);
-        console.log("Prod", prod);
+        // console.log("Prod", prod);
         if (prod) {
           return true;
         } else {

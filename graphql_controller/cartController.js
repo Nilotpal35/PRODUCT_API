@@ -79,13 +79,14 @@ exports.postDeleteCartController = async ({ prodId }, req) => {
   if (!req.isAuth) {
     throw new Error("User not Authorized!");
   }
-  console.log("input items", prodId);
+  // console.log("input items", prodId);
   const userId = req?.userId;
   try {
     const { cartItems } = await cartModel.getCartById(userId);
     console.log("before delete cart", cartItems);
     const newCartItems = [];
     const productFound = cartItems.find((item) => item?.prodId === prodId);
+    console.log("product found", productFound);
     if (!productFound) {
       throw new Error("No product found for this user with this name");
     } else if (productFound && productFound.qty > 1) {
@@ -97,7 +98,7 @@ exports.postDeleteCartController = async ({ prodId }, req) => {
       const restCartItems = cartItems.filter((item) => item.prodId !== prodId);
       newCartItems.push(...restCartItems);
     }
-    console.log("after delete cart", newCartItems);
+    // console.log("after delete cart", newCartItems);
     const response = await cartModel.modifySingleItem(userId, newCartItems);
     if (response.matchedCount > 0 && response.modifiedCount > 0) {
       return { message: "cart item deleted successfully", status: 200 };

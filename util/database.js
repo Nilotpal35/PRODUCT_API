@@ -20,7 +20,8 @@ const run = async (cb) => {
 const MongoConnect = (cb) => {
   run(cb).catch((err) => {
     console.log("Some issue in connection!", err);
-    throw err;
+    process.exit(1);
+    // throw err;
   });
 };
 

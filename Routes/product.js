@@ -10,6 +10,7 @@ productRouter.get("/products", productController);
 productRouter.get("/image/:image", (req, res, next) => {
   const imageName = req.params.image;
   const imagePath = path.join("store", "images", imageName);
+  // console.log("image request coming",imageName,imagePath)
   if (fs.existsSync(imagePath)) {
     const imageStream = fs.createReadStream(imagePath);
     imageStream.pipe(res);

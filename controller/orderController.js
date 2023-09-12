@@ -9,11 +9,11 @@ exports.getOrderCtrl = (req, res, next) => {
     errorMessage += "-> " + item.msg;
   });
   if (errorMessage.trim().length > 0 && error.errors.length > 0) {
-    console.log(error);
+    // console.log(error);
     return next(new Error(errorMessage));
   } else {
     const { userid } = matchedData(req);
-    console.log("userid for get cart", userid);
+    // console.log("userid for get cart", userid);
     try {
       orderModel.getAllOrders(userid).then((orderResponse) => {
         if (orderResponse) {
@@ -32,7 +32,7 @@ exports.getOrderCtrl = (req, res, next) => {
 };
 
 exports.postOrderCtrl = (req, res, next) => {
-  console.log("req body", req?.body);
+  // console.log("req body", req?.body);
   const { userid } = matchedData(req);
   if (req.body && userid) {
     //db operation

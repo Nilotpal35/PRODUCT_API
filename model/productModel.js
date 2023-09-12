@@ -47,4 +47,56 @@ module.exports = class prodModel {
         throw err;
       });
   }
+
+  static createProduct(formData) {
+    const db = getDb();
+    return db
+      .collection("product")
+      .insertOne(formData)
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }
+
+  static updateProduct(prodId, formData) {
+    // // console.log("inside update product model", formData);
+    const db = getDb();
+    return db
+      .collection("product")
+      .updateOne(
+        { _id: new ObjectId(prodId) },
+        {
+          $set: {
+            ...formData,
+          },
+        }
+      )
+      .then((res) => {
+        // console.log("update product res", res);
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }
+
+  static getSingleProductByTitle(text) {
+    const searchText = new RegExp(text, "i");
+    console.log("search text regex", searchText);
+    const db = getDb();
+    return db
+      .collection("product")
+      .find({ title: searchText })
+      .limit(2)
+      .toArray()
+      .then((res) => {
+        return res;
+      })
+      .catch((err) => {
+        throw err;
+      });
+  }
 };

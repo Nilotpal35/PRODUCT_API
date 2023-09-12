@@ -74,9 +74,9 @@ exports.deleteCartController = async (req, res, next) => {
     return next(new Error(errorMessage));
   } else {
     const { prodId, userid } = matchedData(req);
-    console.log("delete cart id :", prodId);
+    // console.log("delete cart id :", prodId);
     const { cartItems } = await cartModel.getCartById(userid);
-    console.log("before delete cart", cartItems);
+    // console.log("before delete cart", cartItems);
     const newCartItems = [];
     const productFound = cartItems.find((item) => item?.prodId === prodId);
     if (!productFound) {
@@ -90,7 +90,7 @@ exports.deleteCartController = async (req, res, next) => {
       const restCartItems = cartItems.filter((item) => item.prodId !== prodId);
       newCartItems.push(...restCartItems);
     }
-    console.log("after delete cart", newCartItems);
+    // console.log("after delete cart", newCartItems);
     try {
       const response = await cartModel.modifySingleItem(userid, newCartItems);
       if (response.matchedCount > 0 && response.modifiedCount > 0) {
