@@ -9,13 +9,13 @@ exports.postProductController = async ({ page }, req) => {
   if (page) {
     PAGE = +page;
   }
-  let PER_PAGE = 1;
+  let PER_PAGE = 3;
   try {
     const totalPage = await prodModel.getTotalDocuments();
 
     //generates total no of pages into array form
     const generatedArray = [];
-    for (let i = 1; i <= totalPage; i++) {
+    for (let i = 1; i <= Math.ceil(totalPage / PER_PAGE); i++) {
       generatedArray.push(i);
     }
 
