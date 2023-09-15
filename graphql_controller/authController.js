@@ -24,6 +24,7 @@ exports.postLoginController = async ({ input }, req) => {
     } else {
       const GENERATED_TOKEN = await generateToken({
         email: input.email,
+        name: user.name,
         userId: user._id.toString(),
       });
       if (GENERATED_TOKEN) {

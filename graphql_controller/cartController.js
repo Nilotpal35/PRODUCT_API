@@ -4,7 +4,9 @@ const prodModel = require("../model/productModel");
 exports.postAddCartController = async ({ input }, req) => {
   if (!req.isAuth) {
     // return { message: "User Not Authorized", status: 404 };
-    throw new Error("User not Authorized");
+    const err = new Error("User not Authorized");
+    err.statusCode = 401;
+    throw err;
   }
   const { userId, prodId } = input;
   const { cartItems } = await cartModel.getCartById(userId);
@@ -35,8 +37,6 @@ exports.postAddCartController = async ({ input }, req) => {
   //end
   // return { message: "item added Successfully", status: 200 };
 };
-
-
 
 exports.postCartItemController = async ({ userId }, req) => {
   if (!req.isAuth) {
@@ -72,8 +72,6 @@ exports.postCartItemController = async ({ userId }, req) => {
     // };
   }
 };
-
-
 
 exports.postDeleteCartController = async ({ prodId }, req) => {
   if (!req.isAuth) {
