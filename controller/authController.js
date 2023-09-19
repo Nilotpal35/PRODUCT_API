@@ -69,11 +69,6 @@ exports.postSignUpCtr = async (req, res, next) => {
   } else {
     const data = matchedData(req);
     const { name, dob, email, password, cnfPassword } = data;
-    // // console.log("Name", name);
-    // // console.log("EMAIL", email);
-    // // console.log("DOB", dob);
-    // // console.log("CNFPASSWORD", cnfPassword);
-    // // console.log("PASSWORD", password);
     try {
       const hashPwd = await generateBcryptHashPawsword(password, 10);
       // console.log("HASH PASSWORD", hashPwd);

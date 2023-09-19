@@ -77,7 +77,7 @@ const schema = buildSchema(`
     }
 
     type simpleReturn {
-        message : String
+        message : String!
     }
 
     type orderItem {
@@ -118,10 +118,12 @@ const schema = buildSchema(`
         postCartItems(userId : String) : cartReturn!
         getAllOrders(page : Int) : orderReturn!
         getSingleProductById(prodId : String!) : product! 
-        postSignup(input : postSignupForm) : String
+        demoQuery(demo : String!) : simpleReturn
     }
 
     type RootMutation {
+        postSignup(input : postSignupForm!) : simpleReturn!
+        demoMutation(demo : String!) : simpleReturn
         postAddCart(input : postAddCartForm) : AddCartMessage!
         postDeleteCart(prodId : String!) : AddCartMessage!
         postOrder(input : postOrderForm!) : simpleReturn!

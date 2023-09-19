@@ -2,8 +2,13 @@ const validator = require("validator");
 const { v4: uuid } = require("uuid");
 const { checkEmailValidity } = require("../useful/emailValid");
 const authModel = require("../model/authModel");
-const { comparePassword } = require("../util/bcrypt");
+const {
+  comparePassword,
+  generateBcryptHashPawsword,
+} = require("../util/bcrypt");
 const { generateToken } = require("../useful/generateToken");
+const { cartModel } = require("../model/cartModel");
+const { orderModel } = require("../model/orderModel");
 
 exports.postLoginController = async ({ input }, req) => {
   // console.log("Authentication", req.isAuth);
@@ -40,8 +45,9 @@ exports.postLoginController = async ({ input }, req) => {
   }
 };
 
-exports.postSignupController = ({ input }) => {
-  // console.log("POST SIGNUP FORM", input);
+exports.postSignupController = async ({ input }) => {
+  console.log("input form", input);
+  // input validation using validator.js
   let errorMessage = "";
   const nameValidation = validator.isLength(input.name, { min: 5 });
   const emailValidation = validator.isEmail(input.email);
@@ -49,6 +55,11 @@ exports.postSignupController = ({ input }) => {
     !validator.isEmpty(input.password) &&
     validator.equals(input.password, input.cnfPassword) &&
     validator.isLength(input.password, { min: 6 });
+  const dobValidation = validator.isDate(input.dob);
+
+  if (!dobValidation) {
+    errorMessage += "Date must be in YYYY-MM-DD format";
+  }
   if (!nameValidation) {
     errorMessage += "Name must be of more than 5 char";
   }
@@ -58,13 +69,52 @@ exports.postSignupController = ({ input }) => {
   if (!emailValidation) {
     errorMessage += "Email not correct";
   }
-  // // console.log("emailvalidation", emailValidation);
-  // // console.log("namevalidation", nameValidation);
-  // // console.log("Password Validation", passwordValidation);
-
-  if (nameValidation && emailValidation && passwordValidation) {
-    return "Sign Up successfully";
+  if (
+    nameValidation &&
+    emailValidation &&
+    passwordValidation &&
+    dobValidation
+  ) {
+    try {
+      const hashPwd = await generateBcryptHashPawsword(input.password, 10);
+      console.log("HASH PASSWORD", hashPwd);
+      const formData = {
+        name: input.name,
+        email: input.email,
+        dob: input.dob,
+        password: hashPwd,
+      };
+      const authResponse = await authModel.storeNewUser(formData);
+      console.log("AUTH RESPONSE", authResponse);
+      if (!authResponse.insertedId) {
+        errorMessage += "Some issue while storing the user";
+        throw new Error(errorMessage);
+      }
+      const cartResponse = await cartModel.initiateCart({
+        userId: authResponse?.insertedId.toString(),
+        cartItems: [],
+      });
+      console.log("CART RESPONSE AFTET AUTH", cartResponse);
+      if (!cartResponse.insertedId) {
+        errorMessage += "some issue in initiating cartItems";
+        throw new Error(errorMessage);
+      }
+      const orderResponse = await orderModel.initiateOrder({
+        userId: authResponse?.insertedId.toString(),
+        orderItems: [],
+      });
+      console.log("ORDER RESPONSE AFTER CART", orderResponse);
+      if (!orderResponse.insertedId) {
+        errorMessage += "some issue in initiating orderItems";
+        throw new Error(errorMessage);
+      }
+      return { message: "Sign Up successfull" };
+    } catch (err) {
+      throw err;
+    }
   } else {
-    throw new Error(errorMessage);
+    const err = new Error(errorMessage);
+    err.statusCode = 422;
+    throw err;
   }
 };

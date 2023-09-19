@@ -8,16 +8,29 @@ const {
   postDeleteCartController,
 } = require("../graphql_controller/cartController");
 const {
-  sendOrderController, getAllOrderController,
+  sendOrderController,
+  getAllOrderController,
 } = require("../graphql_controller/orderGqlController");
 const {
-  postProductController, getSingleProductController, createUpdateProductController,
+  postProductController,
+  getSingleProductController,
+  createUpdateProductController,
 } = require("../graphql_controller/productController");
 const { cartModel } = require("../model/cartModel");
 const { orderModel } = require("../model/orderModel");
 const prodModel = require("../model/productModel");
 
 const resolvers = {
+  demoMutation: ({ demo }) => {
+    console.log("INSIDE DEMO MUTATAION", demo);
+    return { message: "Demo Message" };
+  },
+
+  demoQuery: ({ demo }) => {
+    console.log("INSIDE DEMO QUERY",demo);
+    return { message: "Demo Message" };
+  },
+
   postLogin: postLoginController,
 
   postProducts: postProductController,
