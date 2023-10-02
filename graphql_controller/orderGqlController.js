@@ -1,3 +1,4 @@
+const { errorNames } = require("../constants/constant");
 const { cartModel } = require("../model/cartModel");
 const { orderModel } = require("../model/orderModel");
 
@@ -25,7 +26,9 @@ exports.sendOrderController = async ({ input }, req) => {
 
 exports.getAllOrderController = async ({ page }, req) => {
   if (!req.isAuth) {
-    throw new Error("User not Authorized");
+    const err = new Error(errorNames.UNAUTHORIZED);
+    err.statusCode = 404;
+    throw err;
   }
   const userid = req.userId;
   try {
