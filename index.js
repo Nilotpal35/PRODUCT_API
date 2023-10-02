@@ -20,6 +20,7 @@ const fs = require("fs");
 const morgan = require("morgan");
 const { fetchSearchResult } = require("./graphql_controller/productController");
 const prodModel = require("./model/productModel");
+const { errorTypes } = require("./constants/constant");
 
 const app = express();
 
@@ -95,7 +96,20 @@ app.use(
   graphqlHTTP({
     schema: schema,
     rootValue: resolvers,
-    graphiql: true,
+    graphiql: process.env.NODE_ENV === "development",
+    customFormatErrorFn: (err) => {
+      console.log("custome error", err.message);
+      if (errorTypes[err.message]) {
+        return errorTypes[err.message];
+      } else {
+        return { message: err.message , statusCode : 401};
+      }
+    },
+    // customFormatErrorFn: (err) => {
+    //   const error = errorTypes[err.message];
+    //   console.log(error);
+    //   return { message: error.message };
+    // },
   })
 );
 
