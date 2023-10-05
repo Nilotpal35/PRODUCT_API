@@ -15,6 +15,7 @@ const {
   postProductController,
   getSingleProductController,
   createUpdateProductController,
+  fetchSearchResult,
 } = require("../graphql_controller/productController");
 const { cartModel } = require("../model/cartModel");
 const { orderModel } = require("../model/orderModel");
@@ -27,7 +28,7 @@ const resolvers = {
   },
 
   demoQuery: ({ demo }) => {
-    console.log("INSIDE DEMO QUERY",demo);
+    console.log("INSIDE DEMO QUERY", demo);
     return { message: "Demo Message" };
   },
 
@@ -50,6 +51,8 @@ const resolvers = {
   getSingleProductById: getSingleProductController,
 
   createUpdateProduct: createUpdateProductController,
+
+  getSearchResult: fetchSearchResult,
 };
 
 module.exports = resolvers;

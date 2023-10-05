@@ -92,18 +92,14 @@ exports.createUpdateProductController = async ({ method, input }, req) => {
   }
 };
 
-exports.fetchSearchResult = async (req, res, next) => {
-  console.log("search middlware working fine", req.query);
-  const searchText = req.query.searchText;
-  const result = await prodModel.getSingleProductByTitle(searchText);
-  if (result) {
-    res.json({
-      searchResult: result.map((item) => {
-        return { title: item.title, _id: item._id };
-      }),
-      status: 200,
-    });
-  } else {
-    res.json({ searchResult: [], status: 400 });
+exports.fetchSearchResult = async ({ searchText }) => {
+  console.log("search middlware working fine", searchText);
+
+  try {
+    const result = await prodModel.getSingleProductByTitle(searchText);
+    console.log("search result from mongodb", result);
+    return result;
+  } catch (error) {
+    throw error;
   }
 };

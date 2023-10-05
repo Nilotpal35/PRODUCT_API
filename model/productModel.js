@@ -84,7 +84,7 @@ module.exports = class prodModel {
   }
 
   static getSingleProductByTitle(text) {
-    const searchText = new RegExp(`^${text}`, "i");
+    const searchText = new RegExp(`${text}`);
     console.log("search text regex", searchText);
     const db = getDb();
     return db

@@ -119,6 +119,7 @@ const schema = buildSchema(`
         getAllOrders(page : Int) : orderReturn!
         getSingleProductById(prodId : String!) : product! 
         demoQuery(demo : String!) : simpleReturn
+        getSearchResult(searchText : String!) : [product!]!
     }
 
     type RootMutation {
