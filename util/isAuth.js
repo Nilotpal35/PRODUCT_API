@@ -27,7 +27,7 @@ exports.isAuth = (req, res, next) => {
 exports.isValidUser = (req, res, next) => {
   const authHeader = req.get("Authorization");
   if (!authHeader) {
-    return next(new Error("User not Authorized"));
+    return next();
   }
   const jwt_token = authHeader.split(" ")[1];
   let decodedToken;

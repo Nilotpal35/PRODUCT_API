@@ -18,11 +18,15 @@ const run = async (cb) => {
 };
 
 const MongoConnect = (cb) => {
-  run(cb).catch((err) => {
-    console.log("Some issue in connection!", err);
-    process.exit(1);
-    // throw err;
-  });
+  run(cb)
+    .then(() => {
+      console.log("server is up and running on port 8080");
+    })
+    .catch((err) => {
+      console.log("Some issue in connection!", err);
+      process.exit(1);
+      // throw err;
+    });
 };
 
 const getDb = () => {

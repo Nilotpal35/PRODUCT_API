@@ -16,7 +16,7 @@ const multer = require("multer");
 const helmet = require("helmet");
 const fs = require("fs");
 // const compression = require("compression");
-// const cors = require("cors");
+const cors = require("cors");
 const morgan = require("morgan");
 const { fetchSearchResult } = require("./graphql_controller/productController");
 const prodModel = require("./model/productModel");
@@ -35,6 +35,29 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
+
+// const wss = new WebSocketServer({ port: PORT });
+
+// wss.on("connection", (ws) => {
+//   console.log("New Client Connected!");
+
+//   ws.on("error", console.error);
+
+//   ws.on("close", console.log("Client Disconnected!"));
+
+//   ws.send("Connection Established!");
+
+//   ws.on("message", (data) => {
+//     wss.clients.forEach((client) => {
+//       console.log(`distributing message : ${data}`);
+//       client.send(`${data}`);
+//     });
+//   });
+
+//   ws.onerror = () => {
+//     console.log("websocket error");
+//   };
+// });
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [".png", ".jpg", ".jpeg", ".gif", ".avif"];
@@ -102,7 +125,7 @@ app.use(
       if (errorTypes[err.message]) {
         return errorTypes[err.message];
       } else {
-        return { message: err.message , statusCode : 401};
+        return { message: err.message, statusCode: 401 };
       }
     },
     // customFormatErrorFn: (err) => {
@@ -128,6 +151,13 @@ app.use((req, res, next) => {
   res.status(404).json({ message: "page not found" });
 });
 
+// io.on("connection", (socket) => {
+//   console.log("a user connected!");
+//   socket.on("disconnect", () => {
+//     console.log("A user disconnect!");
+//   });
+// });
+
 //catch any error thrown
 app.use((err, req, res, next) => {
   const status = err?.statusCode || 500;
@@ -136,8 +166,10 @@ app.use((err, req, res, next) => {
 });
 
 MongoConnect(() => {
-  app.listen(PORT, () => {
-    console.log(`server running on port 8080`);
+  const server = app.listen(PORT);
+  const io = require("socket.io")(server);
+  io.on("connection", (socket) => {
+    console.log("Clinet connected!");
   });
 });
 

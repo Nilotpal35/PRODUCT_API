@@ -19,6 +19,7 @@ const {
 const { cartModel } = require("../model/cartModel");
 const { orderModel } = require("../model/orderModel");
 const prodModel = require("../model/productModel");
+const { isValidUser } = require("../util/isAuth");
 
 const resolvers = {
   demoMutation: ({ demo }) => {
@@ -27,7 +28,7 @@ const resolvers = {
   },
 
   demoQuery: ({ demo }) => {
-    console.log("INSIDE DEMO QUERY",demo);
+    console.log("INSIDE DEMO QUERY", demo);
     return { message: "Demo Message" };
   },
 
